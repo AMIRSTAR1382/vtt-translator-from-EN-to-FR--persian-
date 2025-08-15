@@ -1,17 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-vtt_en2fa_gui.py — انتخاب فایل VTT از سیستم، ترجمه به فارسی و ذخیره خروجی.
-
-بدون نیاز به API Key — استفاده از Google Translate غیررسمی (deep-translator)
-
-Install:
-    pip install deep-translator
-
-Run:
-    python vtt_en2fa_gui.py
-"""
-
 import io
 import os
 import re
