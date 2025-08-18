@@ -1,3 +1,6 @@
+بروزرسانی های اینده: اضافه شدن زبان های دیگه به برنامه هستش این فعلا نسخه تست اولیه هستش
+future updates : additional languages will be added to the app. this is an early test version that works properly.
+
 # vtt translator from EN to FR (persian)
 with this code you can give your english vtt file and this code make it to persian in 1-3 minute's
 
