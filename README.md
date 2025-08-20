@@ -93,3 +93,9 @@ This project is open-source and available under the MIT License
 Note: This is the early test version. It works properly, but we are constantly improving it!
 
 توجه: این نسخه آزمایشی اولیه است. به‌درستی کار می‌کند، ولی ما به طور مداوم در حال بهبود آن هستیم!
+
+new update 2025/20/aug:
+In this update, you, dear users, can select multiple files at the same time.
+
+اپدیت جدید 1404/05/29:
+توی این اپدیت شما کاربران عزیز میتونید چند فایل رو همزمان انتخاب کنید
