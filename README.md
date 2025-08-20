@@ -88,7 +88,7 @@ This project is open-source and available under the MIT License
 
 🌐 مجوز:
 
-این پروژه متن‌باز است و تحت مجوز MIT در دسترس است.
+این پروژه متن‌باز است.
 
 Note: This is the early test version. It works properly, but we are constantly improving it!
 
