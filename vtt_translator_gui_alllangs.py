@@ -11,24 +11,30 @@ TAG_PATTERN = re.compile(r"(</?[^>\n]+>)")
 RLE = "\u202B"  # Right-to-Left Embedding
 PDF = "\u202C"  # Pop Directional Formatting
 
+
 def split_text_and_tags(s: str) -> List[str]:
     if not s:
         return [s]
     parts = TAG_PATTERN.split(s)
     return [p for p in parts if p != ""]
 
+
 def join_segments(segments: List[str]) -> str:
     return "".join(segments)
+
 
 def is_timestamp_line(line: str) -> bool:
     return "-->" in line
 
+
 def is_note_block_start(line: str) -> bool:
     return line.strip().startswith("NOTE")
+
 
 def is_style_or_region_header(line: str) -> bool:
     ls = line.strip().upper()
     return ls.startswith("STYLE") or ls.startswith("REGION")
+
 
 def parse_cues(lines: List[str]) -> List[List[str]]:
     blocks = []
@@ -45,12 +51,16 @@ def parse_cues(lines: List[str]) -> List[List[str]]:
         blocks.append(block)
     return blocks
 
+
 def convert_vtt_blocks_to_fa(blocks: List[List[str]]) -> List[List[str]]:
-    translator = GoogleTranslator(source='en', target='fa')
+    translator = GoogleTranslator(source="en", target="fa")
     out_blocks = []
+
     for block in blocks:
         if not block:
             continue
+
+        # بلاک‌های غیر ترجمه‌ای
         if block[0].strip().upper().startswith("WEBVTT"):
             out_blocks.append(block)
             continue
@@ -66,9 +76,11 @@ def convert_vtt_blocks_to_fa(blocks: List[List[str]]) -> List[List[str]]:
         if idx >= len(block):
             out_blocks.append(block)
             continue
-        ts_line = block[idx]
-        text_lines = block[idx+1:] if idx + 1 < len(block) else []
 
+        ts_line = block[idx]
+        text_lines = block[idx + 1 :] if idx + 1 < len(block) else []
+
+        # تقسیم به تگ و متن
         segments_per_line = [split_text_and_tags(t) for t in text_lines]
         to_translate = []
         positions = []
@@ -78,13 +90,15 @@ def convert_vtt_blocks_to_fa(blocks: List[List[str]]) -> List[List[str]]:
                     to_translate.append(seg)
                     positions.append((li, si))
 
+        # ترجمه دسته‌ای
         translated = []
-        for t in to_translate:
+        if to_translate:
             try:
-                translated.append(translator.translate(t))
+                translated = translator.translate_batch(to_translate)
             except Exception:
-                translated.append(t)
+                translated = to_translate
 
+        # جایگزینی متن‌های ترجمه‌شده
         for (li, si), new_text in zip(positions, translated):
             segments_per_line[li][si] = f"{RLE}{new_text}{PDF}"
 
@@ -99,9 +113,11 @@ def convert_vtt_blocks_to_fa(blocks: List[List[str]]) -> List[List[str]]:
 
     return out_blocks
 
+
 def read_vtt(path: str) -> List[str]:
     with io.open(path, "r", encoding="utf-8-sig") as f:
         return f.readlines()
+
 
 def write_vtt(path: str, blocks: List[List[str]]):
     with io.open(path, "w", encoding="utf-8") as f:
@@ -113,32 +129,46 @@ def write_vtt(path: str, blocks: List[List[str]]):
             for line in block:
                 f.write(line + "\n")
 
+
 def main():
     root = tk.Tk()
     root.withdraw()
 
-    file_path = filedialog.askopenfilename(
-        title="انتخاب فایل VTT",
+    file_paths = filedialog.askopenfilenames(
+        title="انتخاب فایل‌های VTT",
         filetypes=[("VTT files", "*.vtt"), ("All files", "*.*")]
     )
-    if not file_path:
+    if not file_paths:
         messagebox.showinfo("انصراف", "هیچ فایلی انتخاب نشد.")
         return
 
-    try:
-        lines = read_vtt(file_path)
-        blocks = parse_cues(lines)
-        out_blocks = convert_vtt_blocks_to_fa(blocks)
+    success_files = []
+    errors = []
 
-        if not (out_blocks and out_blocks[0][0].strip().upper().startswith("WEBVTT")):
-            out_blocks = [["WEBVTT"]] + [[""]] + out_blocks
+    for file_path in file_paths:
+        try:
+            lines = read_vtt(file_path)
+            blocks = parse_cues(lines)
+            out_blocks = convert_vtt_blocks_to_fa(blocks)
 
-        output_path = os.path.splitext(file_path)[0] + "-fa.vtt"
-        write_vtt(output_path, out_blocks)
+            if not (out_blocks and out_blocks[0][0].strip().upper().startswith("WEBVTT")):
+                out_blocks = [["WEBVTT"]] + [[""]] + out_blocks
 
-        messagebox.showinfo("موفقیت", f"فایل ترجمه‌شده ذخیره شد:\n{output_path}")
-    except Exception as e:
-        messagebox.showerror("خطا", f"مشکلی پیش آمد:\n{e}")
+            output_path = os.path.splitext(file_path)[0] + "-fa.vtt"
+            write_vtt(output_path, out_blocks)
+
+            success_files.append(output_path)
+        except Exception as e:
+            errors.append(f"{file_path}: {e}")
+
+    msg = ""
+    if success_files:
+        msg += "فایل‌های ترجمه‌شده ذخیره شدند:\n" + "\n".join(success_files)
+    if errors:
+        msg += "\n\nفایل‌های ناموفق:\n" + "\n".join(errors)
+
+    messagebox.showinfo("نتیجه", msg)
+
 
 if __name__ == "__main__":
     main()
