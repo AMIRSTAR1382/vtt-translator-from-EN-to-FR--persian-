@@ -1,4 +1,4 @@
-VTT Translator (EN to FA) 🌍
+#VTT Translator (EN to FA) 🌍
 
 Convert your English VTT subtitles to Persian in just 1-3 minutes!
 این ابزار ساده زیرنویس‌های VTT انگلیسی شما رو به فارسی ترجمه می‌کنه، بدون نیاز به API Key و با استفاده از Google Translate (غیررسمی).
